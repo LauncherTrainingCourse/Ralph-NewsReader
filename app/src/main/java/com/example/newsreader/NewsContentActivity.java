@@ -31,7 +31,13 @@ public class NewsContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.news_content_activity);
         final Intent intent = getIntent();
-        int newsID = intent.getIntExtra(MainActivity.EXTRA_MESSAGE, 0);
+        int newsID ;
+
+        if(intent.getStringExtra("activity_name").equals("NewsReader"))
+            newsID = intent.getIntExtra(MainActivity.EXTRA_MESSAGE, 0);
+        else
+            newsID = intent.getExtras().getInt("newsNo");
+
         newsData = getData(newsID);
 
         TextView titleView = (TextView)findViewById(R.id.content_title);
@@ -96,6 +102,7 @@ public class NewsContentActivity extends AppCompatActivity {
         String SQL = "SELECT * FROM newsTable WHERE _id=" + newsID;
         Cursor cursor = db.rawQuery(SQL, null);
         cursor.moveToFirst();
+        db.close();
         return new NewsData(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4), cursor.getInt(5));
     }
 }

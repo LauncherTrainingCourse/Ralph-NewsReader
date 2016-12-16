@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 int message = newsData.get(position).getID();
                 Intent intent = new Intent(view.getContext(), NewsContentActivity.class);
                 intent.putExtra(EXTRA_MESSAGE, message);
+                intent.putExtra("activity_name", "NewsReader");
                 startActivityForResult(intent, PICK_CONTACT_REQUEST);
             }
         });
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     public void getData() {
         NewsDB dbHelper = new NewsDB(this);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String SQL = "SELECT * FROM newsTable";
+        String SQL = "SELECT * FROM newsTable ORDER BY stars DESC";
         Cursor cursor = db.rawQuery(SQL, null);
         cursor.moveToFirst();
         for (int i = 0; i < cursor.getCount(); i++) {
