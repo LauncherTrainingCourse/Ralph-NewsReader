@@ -17,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<NewsData> newsData = new ArrayList<>();
     public final static String EXTRA_MESSAGE = "com.example.newsreader.MESSAGE";
+    public final static String ACTIVITY_NAME = "activity_name";
     private ListView listView;
     private NewsListAdapter listAdapter;
     static final int PICK_CONTACT_REQUEST = 1;
@@ -42,14 +43,14 @@ public class MainActivity extends AppCompatActivity {
                 int message = newsData.get(position).getID();
                 Intent intent = new Intent(view.getContext(), NewsContentActivity.class);
                 intent.putExtra(EXTRA_MESSAGE, message);
-                intent.putExtra("activity_name", "NewsReader");
-                startActivityForResult(intent, PICK_CONTACT_REQUEST);
+                intent.putExtra(ACTIVITY_NAME, "NewsReader");
+                startActivityForResult(intent, PICK_CONTACT_REQUEST);   //Call the NewsContentActivity to show content of news
             }
         });
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent Data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent Data) { //To handle the data which get from NewsContentActivity
         Log.d("Get Result", "Get news Rating");
         if(requestCode == PICK_CONTACT_REQUEST) {
             if(resultCode == RESULT_OK) {
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         rateUpdate(updatedItem, newsRating);
         newsData.clear();
         getData();
-        listAdapter.notifyDataSetChanged();
+        listAdapter.notifyDataSetChanged();     //Update ListView
     }
 
     public void getData() {

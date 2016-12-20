@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import static android.widget.Toast.LENGTH_SHORT;
+
 /**
  * Created by Ralph_Chao on 2016/12/15.
  */
@@ -31,13 +33,17 @@ public class NewsContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.news_content_activity);
         final Intent intent = getIntent();
-        int newsID ;
+        int newsID = 0;
+        boolean fromReader;
 
-        if(intent.getStringExtra("activity_name").equals("NewsReader"))
+        if(intent.getStringExtra("activity_name").equals("NewsReader")) {       //Check which activity call NewsContentActivity
             newsID = intent.getIntExtra(MainActivity.EXTRA_MESSAGE, 0);
-        else
+            fromReader = true;
+        }
+        else{
             newsID = intent.getExtras().getInt("newsNo");
-
+            fromReader = false;
+        }
         newsData = getData(newsID);
 
         TextView titleView = (TextView)findViewById(R.id.content_title);
@@ -56,7 +62,7 @@ public class NewsContentActivity extends AppCompatActivity {
                 PackageManager packageManager = getPackageManager();
                 List<ResolveInfo> activities = packageManager.queryIntentActivities(webIntent, 0);
                 boolean isIntentSave = activities.size() > 0;
-                Toast.makeText(NewsContentActivity.this, "There are "+activities.size()+" apps respond to intent", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NewsContentActivity.this, "There are "+activities.size()+" apps respond to intent", LENGTH_SHORT).show();
                 if(isIntentSave)
                     startActivity(webIntent);
             }
@@ -74,26 +80,31 @@ public class NewsContentActivity extends AppCompatActivity {
                 PackageManager packageManager = getPackageManager();
                 List<ResolveInfo> activities = packageManager.queryIntentActivities(shareIntent, 0);
                 boolean isIntentSave = activities.size() > 0;
-                Toast.makeText(NewsContentActivity.this, "There are "+activities.size()+" apps respond to intent", Toast.LENGTH_SHORT).show();
+                Toast.makeText(NewsContentActivity.this, "There are "+activities.size()+" apps respond to intent", LENGTH_SHORT).show();
                 if(isIntentSave)
                     startActivity(chooser);
             }
         });
-
-        RatingBar ratingBar = (RatingBar)findViewById(R.id.rating_bar);
-        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                System.out.println(rating);
-                backIntent = new Intent();
-                backData = new Bundle();
-                backData.putInt("Target",newsData.getID());
-                backData.putFloat("Rating", rating);
-                backIntent.putExtras(backData);
-                NewsContentActivity.this.setResult(RESULT_OK, backIntent);
-            }
-        });
-        ratingBar.setRating(newsData.getStars());
+        if(fromReader) {
+            RatingBar ratingBar = (RatingBar) findViewById(R.id.rating_bar);
+            ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+                @Override
+                public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                    System.out.println(rating);
+                    backIntent = new Intent();
+                    backData = new Bundle();
+                    backData.putInt("Target", newsData.getID());
+                    backData.putFloat("Rating", rating);
+                    backIntent.putExtras(backData);
+                    NewsContentActivity.this.setResult(RESULT_OK, backIntent);
+                }
+            });
+            ratingBar.setRating(newsData.getStars());
+        }
+        else {                                          //To hide rating bar
+            View rb = findViewById(R.id.rating_bar);
+            rb.setVisibility(View.GONE);
+        }
     }
 
     public NewsData getData(int newsID) {
